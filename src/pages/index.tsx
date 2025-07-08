@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetStaticProps } from 'next';
 import { DocsConfig, loadDocsConfig } from '@wse/libs/docs-config';
 import { serialize } from 'next-mdx-remote-client/serialize';
 import { MDXClient } from 'next-mdx-remote-client';
@@ -60,51 +60,18 @@ export default function DocPage({
   );
 }
 
-function getAllMdxFiles(dir: string, basePath: string = ''): Array<{ params: { slug: string[] } }> {
-  const files = fs.readdirSync(dir);
-  const paths: Array<{ params: { slug: string[] } }> = [];
+export const getStaticProps: GetStaticProps = async () => {
+  const filePaths = ['index', 'readme'].map((name) => {
+    return path.resolve(path.join(CONTENT_PATH, `${name}.mdx`));
+  });
 
-  for (const file of files) {
-    const fullPath = path.join(dir, file);
-    const stat = fs.statSync(fullPath);
-
-    if (stat.isDirectory()) {
-      // Recursively get files from subdirectories
-      const subPaths = getAllMdxFiles(fullPath, path.join(basePath, file));
-      paths.push(...subPaths);
-    } else if (file.endsWith('.mdx')) {
-      const fileName = file.replace(/\.mdx$/, '');
-      const slugArray = basePath ? [...basePath.split('/'), fileName] : [fileName];
-      paths.push({ params: { slug: slugArray } });
-    }
-  }
-
-  return paths;
-}
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = getAllMdxFiles(CONTENT_PATH);
-
-  return { 
-    paths, 
-    fallback: false 
-  };
-};
-
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const slug = params?.slug as string[];
-  if (!slug || slug.length === 0) {
-    return { notFound: true };
-  }
-  
-  const filePath = path.join(CONTENT_PATH, ...slug) + '.mdx';
-  
+  const existedPath = filePaths.find((filePath) => fs.existsSync(filePath));
   // Check if file exists
-  if (!fs.existsSync(filePath)) {
+  if (!existedPath) {
     return { notFound: true };
   }
-  
-  const source = fs.readFileSync(filePath, 'utf8');
+
+  const source = fs.readFileSync(existedPath, 'utf8');
   const { data, content } = matter(source);
   const docsConfig = loadDocsConfig();
 
@@ -115,13 +82,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       parseFrontmatter: false, // Frontmatter already parsed by gray-matter
       mdxOptions: {
         recmaPlugins: [recmaMdxEscapeMissingComponents],
-        remarkPlugins: [remarkMdxImports, () => remarkTransformPaths(filePath)], // Ensure order: imports first, then path transforms
+        remarkPlugins: [() => remarkTransformPaths(existedPath), remarkMdxImports], // Ensure order: imports first, then path transforms
       },
     },
   });
 
   // In development, force fresh data by including file modification time
-  const fileStats = fs.statSync(filePath);
+  const fileStats = fs.statSync(existedPath);
   const lastModified = fileStats.mtimeMs;
 
   return {

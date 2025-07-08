@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"next dev\" \"tsx scripts/watch-content.ts\"",
-    "build": "next build",
+    "dev": "pnpm run cp:content && concurrently \"next dev\" \"tsx scripts/watch-content.ts\"",
+    "cp:content": "tsx scripts/copy-content.ts",
+    "build": "pnpm run cp:content && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -25,6 +26,7 @@
     "@mdx-js/loader": "^3.1.0",
     "@mdx-js/react": "^3.1.0",
     "@tailwindcss/postcss": "^4",
+    "@types/fs-extra": "^11.0.4",
     "@types/mdast": "^4.0.4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -35,6 +37,7 @@
     "concurrently": "^9.2.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
+    "fs-extra": "^11.3.0",
     "mdast": "^3.0.0",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.13",
