@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "pnpm run cp:content && concurrently \"next dev\" \"tsx scripts/watch-content.ts\"",
     "cp:content": "tsx scripts/copy-content.ts",
-    "build": "pnpm run cp:content && next build && pnpm run rm:content-hash",
+    "build": "pnpm run cp:content && next build && pnpm run clean:outdir-md",
     "start": "next start",
     "lint": "next lint",
-    "rm:content-hash": "rimraf public/content/.content-hash"
+    "clean:outdir-md": "tsx scripts/clean-outdir.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "glob": "^11.0.3",
     "gray-matter": "^4.0.3",
     "lodash": "^4.17.21",
     "next": "15.3.5",

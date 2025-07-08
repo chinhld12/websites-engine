@@ -9,13 +9,18 @@ export default function HotReload() {
       return;
     }
 
-    let ws: WebSocket;
+    let ws: WebSocket | null = null;
+    let currentPort = 55980;
+    const maxPort = 55999;
+    let connected = false;
 
-    const connect = () => {
-      ws = new WebSocket('ws://localhost:3001');
+    const tryConnect = (port: number) => {
+      ws = new WebSocket(`ws://localhost:${port}`);
 
       ws.onopen = () => {
-        console.log('🔗 Connected to hot-reload server');
+        connected = true;
+        currentPort = port;
+        console.log(`🔗 Connected to hot-reload server on port ${port}`);
       };
 
       ws.onmessage = (event) => {
@@ -31,17 +36,24 @@ export default function HotReload() {
       };
 
       ws.onclose = () => {
-        console.log('📱 Disconnected from hot-reload server, attempting reconnect...');
-        // Attempt to reconnect after 1 second
-        setTimeout(connect, 1000);
+        if (connected) {
+          console.log(`📱 Disconnected from hot-reload server on port ${currentPort}, attempting reconnect...`);
+        }
+        connected = false;
+        // Try next port up to maxPort, then wrap around
+        const nextPort = currentPort < maxPort ? currentPort + 1 : 3001;
+        setTimeout(() => tryConnect(nextPort), 1000);
       };
 
       ws.onerror = (error) => {
-        console.error('Hot-reload WebSocket error:', error);
+        // Only log error if not connected
+        if (!connected) {
+          console.error('Hot-reload WebSocket error:', error);
+        }
       };
     };
 
-    connect();
+    tryConnect(currentPort);
 
     return () => {
       if (ws) {

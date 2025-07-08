@@ -6,7 +6,6 @@ import { DocsConfig, loadDocsConfig } from '@wse/libs/docs-config';
 import { serialize } from 'next-mdx-remote-client/serialize';
 import { MDXClient } from 'next-mdx-remote-client';
 import type { SerializeResult } from 'next-mdx-remote-client/serialize';
-import HotReload from '@wse/components/HotReload';
 import { remarkTransformPaths } from '@wse/libs/mdx-remarks/remark-transform-paths';
 import { remarkMdxImports } from '@wse/libs/mdx-remarks/remark-mdx-imports';
 import recmaMdxEscapeMissingComponents from 'recma-mdx-escape-missing-components';
@@ -44,7 +43,6 @@ export default function DocPage({
 
   return (
     <main style={{ maxWidth: 700, margin: '0 auto', padding: 32 }}>
-      <HotReload />
       <nav>
         {/* Example: Render navigation from docsConfig */}
         {docsConfig?.navigation && (
