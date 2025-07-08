@@ -1,4 +1,3 @@
 [submodule "content"]
 	path = content
 	url = git@github.com:chinhld12/mdx-source.git
-	branch = main

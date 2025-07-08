@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.submodule_update_cache
+
+# Build artifacts
+public/content
