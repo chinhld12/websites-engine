@@ -16,8 +16,11 @@ function cloneRepository() {
   };
   // Check if the content directory already exists
   if (repoUrl) {
-    // Check if the content directory exists
-    if (fs.existsSync(contentPath)) {
+    // Check if the content directory exists and has content
+    if (
+      fs.existsSync(contentPath) &&
+      fs.readdirSync(contentPath, { withFileTypes: true }).length > 0
+    ) {
       // Check if it's a git repository
       if (fs.existsSync(path.join(contentPath, '.git'))) {
         console.log(
@@ -35,21 +38,17 @@ function cloneRepository() {
         });
         return;
       }
-      console.log(
-        'Content directory exists but is not a git repository. Removing it...',
-      );
-      // Remove the existing content directory
-      fs.rmSync(contentPath, { recursive: true, force: true });
+    } else {
+      // Clone the repository
+      git.clone(repoUrl, contentPath, options, err => {
+        if (err) {
+          console.error('Failed to clone repository:', err);
+          process.exit(1);
+        } else {
+          console.log('Repository cloned successfully to', contentPath);
+        }
+      });
     }
-    // Clone the repository
-    git.clone(repoUrl, contentPath, options, err => {
-      if (err) {
-        console.error('Failed to clone repository:', err);
-        process.exit(1);
-      } else {
-        console.log('Repository cloned successfully to', contentPath);
-      }
-    });
   } else {
     console.error('REPO_CONTENT environment variable is not set.');
     process.exit(1);
