@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm run cp:content && concurrently \"next dev\" \"tsx scripts/watch-content.ts\"",
+    "dev": "pnpm run clone:repo && pnpm run cp:content && concurrently \"next dev\" \"tsx scripts/watch-content.ts\"",
     "cp:content": "tsx scripts/copy-content.ts",
-    "build": "pnpm run cp:content && next build && pnpm run clean:outdir-md",
+    "build": "pnpm run clone:repo && pnpm run cp:content && next build && pnpm run clean:outdir-md",
     "start": "next start",
     "lint": "next lint",
-    "clean:outdir-md": "tsx scripts/clean-outdir.ts"
+    "clean:outdir-md": "tsx scripts/clean-outdir.ts",
+    "clone:repo": "tsx scripts/clone-repo.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -37,6 +38,7 @@
     "@types/ws": "^8.18.1",
     "chokidar": "^4.0.3",
     "concurrently": "^9.2.0",
+    "dotenv": "^17.1.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
     "fs-extra": "^11.3.0",
@@ -46,6 +48,7 @@
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
     "rimraf": "^6.0.1",
+    "simple-git": "^3.28.0",
     "tailwindcss": "^4",
     "tsx": "^4.20.3",
     "typescript": "^5",

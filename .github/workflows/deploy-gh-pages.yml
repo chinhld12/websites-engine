@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.env.REPO_CONTENT != '' }}
     permissions:
       contents: write
       pages: write
